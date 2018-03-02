@@ -16,7 +16,7 @@ import requests
 import six
 
 #Application-specific imports
-from . import exceptions as RH_exception
+import rh_exceptions as RH_exception
 
 
 class Bounds(Enum):
