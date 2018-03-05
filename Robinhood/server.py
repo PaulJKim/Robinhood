@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, Response
+from flask_cors import CORS
 from Robinhood import Robinhood
 
 import urllib2
@@ -6,6 +7,7 @@ import json
 
 
 app = Flask(__name__)
+CORS(app)
 rh_client = Robinhood()
 logged_in = False
 
@@ -15,9 +17,14 @@ def login():
     logged_in = rh_client.login(username=content['user'], password=content['pass'])
 
     if logged_in:
-        return "Logged in"
+        message = "Logged in"
     else:
-        return "Failed to log in"
+        message = "Failed to log in"
+
+    response = Response(message, status=200, mimetype='application/json')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
 
 # Requires paramenter "ticker" ex. fundamentals?ticker=MSFT
 @app.route("/fundamentals", methods=['GET'])
@@ -26,9 +33,12 @@ def get_fundamentals():
 
     # Retrieve fundamentals from Robinhood and convert to JSON
     fundamentals_data = rh_client.get_fundamentals(stock=ticker)
-    fundamentals_data = json.dumps(fundamentals_data)
 
-    return fundamentals_data
+    response = Response(json.dumps(fundamentals_data), status=200, mimetype='application/json')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    print response.get_data()
+
+    return response
 
 # Return JSON list of symbols for securities owned by user
 @app.route("/positions", methods=['GET'])
