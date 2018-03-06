@@ -9,10 +9,10 @@
 // 	.attr('class', 'x axis')
 // 	.attr('transform', 'translate(80,250)')
 // 	.call(xAxis);
-var user = document.getElementById('login_button');
+var login = document.getElementById('login_button');
 var positions_list;
 
-user.onclick = function () {
+login.onclick = function () {
 	login_field = document.getElementById('login_field');
 	password_field = document.getElementById('password_field');
 
@@ -45,9 +45,10 @@ function get_positions_list() {
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {
-	      console.log(xhr.responseText);
+	      sessionStorage.myValue = xhr.responseText;
+	      location.href = "homepage.html";
 	    } else {
-	      console.error(xhr.statusText);
+	      console.error(xhr.responseText + " : " + xhr.statusText);
 	    }
 	  }
 	};
@@ -55,9 +56,6 @@ function get_positions_list() {
 	  console.error(xhr.statusText);
 	};
 	xhr.send(null);
-
-	//positions_list = xhr.response;
-	//console.log(positions_list);
 }
 
 
