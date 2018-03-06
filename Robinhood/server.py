@@ -26,6 +26,15 @@ def login():
 
     return response
 
+@app.route("/logout", methods=['GET'])
+def logout():
+    rh_client.logout()
+
+    if logged_in is False:
+        return Response("Logged out", status=200, mimetype='application/json')
+    else:
+        return Response("Logged out", status=200, mimetype='application/json')
+
 # Requires paramenter "ticker" ex. fundamentals?ticker=MSFT
 @app.route("/fundamentals", methods=['GET'])
 def get_fundamentals():
@@ -43,17 +52,26 @@ def get_fundamentals():
 # Return JSON list of symbols for securities owned by user
 @app.route("/positions", methods=['GET'])
 def get_my_positions():
-    user_positions = rh_client.securities_owned()['results']
-    position_list = list()
+    if logged_in:
+        user_positions = rh_client.securities_owned()['results']
+        position_list = list()
 
-    for position in user_positions:
+        for position in user_positions:
 
-        # Call URL from original dict of positions and then load JSON string and extract symbol for specific stock
-        contents = urllib2.urlopen(position['instrument']).read()
-        contents_dict = json.loads(contents)
-        position_list.append(contents_dict['symbol'])
+            # Call URL from original dict of positions and then load JSON string and extract symbol for specific stock
+            contents = urllib2.urlopen(position['instrument']).read()
+            contents_dict = json.loads(contents)
+            position_list.append(contents_dict['symbol'])
 
-    return json.dumps(position_list)
+        response = Response(json.dumps(position_list), status=200, mimetype='application/json')
+        response.headers.add('Access-Control-Allow-Origin', '*')
+
+        return response
+    else:
+        response_msg = "Not logged in"
+        response = Response(response_msg, status=200, mimetype='application/json')
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
 if __name__ == "__main__":
     app.run()

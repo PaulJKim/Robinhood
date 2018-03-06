@@ -10,6 +10,8 @@
 // 	.attr('transform', 'translate(80,250)')
 // 	.call(xAxis);
 var user = document.getElementById('login_button');
+var positions_list;
+
 user.onclick = function () {
 	login_field = document.getElementById('login_field');
 	password_field = document.getElementById('password_field');
@@ -17,17 +19,43 @@ user.onclick = function () {
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "http://127.0.0.1:5000/login", true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
+	xhr.onload = function (e) {
+	  if (xhr.readyState === 4) {
+	    if (xhr.status === 200) {
+	      console.log(xhr.responseText);
+	    } else {
+	      console.error(xhr.statusText);
+	    }
+	  }
+	};
+	xhr.onerror = function (e) {
+	  console.error(xhr.statusText);
+	};
 	response = xhr.send(JSON.stringify({
 		"user" : login_field.value,
 		"pass" : password_field.value
 	}));
 
+	// xhr.open("GET", "http://127.0.0.1:5000/positions", true);
+	// xhr.onload = function (e) {
+	//   if (xhr.readyState === 4) {
+	//     if (xhr.status === 200) {
+	//       console.log(xhr.responseText);
+	//     } else {
+	//       console.error(xhr.statusText);
+	//     }
+	//   }
+	// };
+	// xhr.onerror = function (e) {
+	//   console.error(xhr.statusText);
+	// };
+	// xhr.send(null);
 }
 
 
-d3.json('http://127.0.0.1:5000/' + "fundamentals?ticker=MSFT", function(data) {
-    console.log(data);
-});
+// d3.json('http://127.0.0.1:5000/positions' + "fundamentals?ticker=MSFT", function(data) {
+    
+// });
 
 	// X Scale
 // 	var hzdExtent = d3.extent(dataset, function(d){
