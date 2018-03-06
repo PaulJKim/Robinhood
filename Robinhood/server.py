@@ -13,6 +13,7 @@ logged_in = False
 
 @app.route("/login", methods=['POST'])
 def login():
+    global logged_in
     content = request.get_json(force=True)
     logged_in = rh_client.login(username=content['user'], password=content['pass'])
 
@@ -24,6 +25,7 @@ def login():
     response = Response(message, status=200, mimetype='application/json')
     response.headers.add('Access-Control-Allow-Origin', '*')
 
+    print logged_in
     return response
 
 @app.route("/logout", methods=['GET'])
@@ -52,7 +54,8 @@ def get_fundamentals():
 # Return JSON list of symbols for securities owned by user
 @app.route("/positions", methods=['GET'])
 def get_my_positions():
-    if logged_in:
+    global logged_in
+    if logged_in is True:
         user_positions = rh_client.securities_owned()['results']
         position_list = list()
 

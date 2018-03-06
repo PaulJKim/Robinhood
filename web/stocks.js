@@ -22,9 +22,10 @@ user.onclick = function () {
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {
-	      console.log(xhr.responseText);
+	      alert(xhr.responseText);
+	      get_positions_list();
 	    } else {
-	      console.error(xhr.statusText);
+	      alert(xhr.statusText);
 	    }
 	  }
 	};
@@ -36,20 +37,27 @@ user.onclick = function () {
 		"pass" : password_field.value
 	}));
 
-	// xhr.open("GET", "http://127.0.0.1:5000/positions", true);
-	// xhr.onload = function (e) {
-	//   if (xhr.readyState === 4) {
-	//     if (xhr.status === 200) {
-	//       console.log(xhr.responseText);
-	//     } else {
-	//       console.error(xhr.statusText);
-	//     }
-	//   }
-	// };
-	// xhr.onerror = function (e) {
-	//   console.error(xhr.statusText);
-	// };
-	// xhr.send(null);
+}
+
+function get_positions_list() {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "http://127.0.0.1:5000/positions", true);
+	xhr.onload = function (e) {
+	  if (xhr.readyState === 4) {
+	    if (xhr.status === 200) {
+	      console.log(xhr.responseText);
+	    } else {
+	      console.error(xhr.statusText);
+	    }
+	  }
+	};
+	xhr.onerror = function (e) {
+	  console.error(xhr.statusText);
+	};
+	xhr.send(null);
+
+	//positions_list = xhr.response;
+	//console.log(positions_list);
 }
 
 
