@@ -30,9 +30,9 @@ def login():
 @app.route("/logout", methods=['GET'])
 def logout():
     global logged_in
-    rh_client.logout()
-
-    if logged_in is False:
+    req = rh_client.logout()
+    print req;
+    if req.ok:
         return Response("Logging out", status=200, mimetype='application/json')
     else:
         return Response("Not Logged out", status=200, mimetype='application/json')

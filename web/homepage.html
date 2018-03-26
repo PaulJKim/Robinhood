@@ -3,15 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Robinhood</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./homepage_style.css">
 </head>
 <body>
-	<p>Home Page</p>
-	<input type="button" value="Log Out" id="logout_button"/>
+	<div class="navbar">
+	  <a href="#home">Home</a>
+	  <a href="#news">News</a>
+	  <div class="dropdown">
+	    <button class="dropbtn" id="dropdown_button">Dropdown
+	      <i class="fa fa-caret-down"></i>
+	    </button>
+	    <div class="dropdown-content" id="settings_dropdown">
+	      <a id="logout" href="#">Logout</a>
+	    </div>
+	  </div> 
+	</div>
+
 	<div id="list_of_positions_div">
 	</div>
-	<svg width="720" height="500" style="border: 1px solid #777;">
-    </svg>
+	<div id="svg_container">
+		<svg width="720" height="500" style="border: 1px solid #777;">
+	    </svg>
+	</div>
 </body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="js/homepage.js"></script>

@@ -2,11 +2,25 @@
 * Written by Paul Kim
 */
 
-var logout = document.getElementById('logout_button');
+var logout = document.getElementById('logout');
+var dropdown = document.getElementById('dropdown_button');
 var alphavantage_key = "SVQQFVAXS04D4RUG"
 
 svg = d3.select("svg");
 var margin = {top: 20, right: 20, bottom: 30, left: 50}
+
+dropdown.onclick = function() {
+	document.getElementById("settings_dropdown").classList.toggle("show");
+}
+
+window.onclick = function(e) {
+  if (!e.target.matches('.dropbtn')) {
+    var setting_dropdown = document.getElementById("settings_dropdown");
+      if (setting_dropdown.classList.contains('show')) {
+        setting_dropdown.classList.remove('show');
+      }
+  }
+}
 
 logout.onclick = function () {
 
