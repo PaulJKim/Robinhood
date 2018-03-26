@@ -8,12 +8,18 @@
 <body>
 	<!-- Button to open the modal login form -->
 
-	<form name="login">
-		Username<input type="text" name="userid" id="login_field"/>
-		Password<input type="password" name="pswrd" id="password_field"/>
-		<input type="button" value="Login" id="login_button"/>
-		<input type="reset" value="Cancel"/>
-	</form>
+    <div id="login_container">
+    	<form name="login">
+            <label for="username">Username:</label>
+    		<input type="text" name="userid" id="login_field"/>
+            <label for="password">Password:</label>
+    		<input type="password" name="pswrd" id="password_field"/>
+            <div id="lower">
+        		<input type="button" value="Login" id="login_button"/>
+        		<input type="reset" value="Cancel"/>
+            </div>
+    	</form>
+    </div>
     <!-- <div id="main">
         <svg width="600" height="740" style="border: 1px solid #777;">
         </svg>
@@ -21,5 +27,5 @@
     <p style="color:white;"></p>
 </body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="stocks.js"></script>
+<script src="js/stocks.js"></script>
 </html>

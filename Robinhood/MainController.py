@@ -5,7 +5,6 @@ from Robinhood import Robinhood
 import urllib2
 import json
 
-
 app = Flask(__name__)
 CORS(app)
 rh_client = Robinhood()
