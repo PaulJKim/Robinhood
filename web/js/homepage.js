@@ -68,12 +68,12 @@ for (var i = 0; i <  checkbox_list.length; i++) {
 	console.log(checkbox_list[i].value);
 	checkbox_list[i].onclick = function() {
 	    if(this.checked) {
-	    	svg.selectAll("circle").remove();
+	    	svg.selectAll("path").remove();
 	        get_fundamentals(this.value);
 	        console.log("Getting time series data");
 	        get_time_series_intraday(this.value);
 	    } else {
-	    	svg.selectAll("circle").remove();
+	    	svg.selectAll("path").remove();
 	        console.log("Unselected " + this.value);
 	    }
 	};
@@ -123,42 +123,38 @@ function get_time_series_intraday(ticker) {
 function process_time_series_data(time_series_data) {
 	ticker = Object.keys(time_series_data)[0];
     time_series_array = [];
-    for (var key in time_series_data[ticker]) {
-	    if (time_series_data[ticker].hasOwnProperty(key)) {
-	        time_series_array.push( [ key, time_series_data[ticker][key] ] );
+
+    for (date in time_series_data[ticker]) {
+	    if (time_series_data[ticker].hasOwnProperty(date)) {
+	        time_series_array.push({key : date, value : time_series_data[ticker][date]});
 	    }
 	}
 
 	var parseTime = d3.timeParse("%Y-%m-%d");
 
+	// Scaling methods for graphing volume vs. time
 	var x = d3.scaleTime()
 		.domain(d3.extent(time_series_array, function(d) {
-			return parseTime(d[0]);
+			return parseTime(d.key);
 		}))
-	    .rangeRound([margin.left, svg.attr("width") - margin.right]);
+	    .range([margin.left, svg.attr("width") - margin.right]);
 
 	var y = d3.scaleLinear()
 		.domain(d3.extent(time_series_array, function(d) {
-			return parseInt(d[1]['5. volume']);
+			return parseInt(d.value['5. volume']);
 		}))
-		.range([parseInt(svg.attr("height")) + margin.top, margin.bottom]);
+		.range([parseInt(svg.attr("height")) - margin.bottom, margin.top]);
 
+	// Creates a line graph of volume per day
 	var volumeline = d3.line()
 	    .x(function(d) {
-	    	console.log(d) 
-	    	return x(parseTime(d)); })
+	    	return x(parseTime(d.key)) })
 	    .y(function(d) { 
-	    	console.log(d[1]['5. volume']);
-	    	return y(parseInt(d[1]['5. volume'])); });
+	    	return y(parseInt(d.value['5. volume'])) });
 
-	//console.log(time_series_array[0]);
-	d3.select("svg").selectAll("path")
-		.data(time_series_array)
-		.enter()
-		.append("path")
-		.attr("class", function(d) {
-			console.log(d);
-			return "line";
-		})
-      	.attr("d", volumeline(d));
+	// The data here needs to passed in as an array
+	svg.append("path")
+		.data([time_series_array])
+		.attr("class", "line")
+      	.attr("d", volumeline);
 }
