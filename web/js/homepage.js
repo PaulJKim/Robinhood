@@ -25,7 +25,7 @@ window.onclick = function(e) {
 logout.onclick = function () {
 
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://127.0.0.1:5000/logout", true);
+	xhr.open("GET", "http://127.0.0.1:5000/robinhood/logout", true);
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {
@@ -83,7 +83,7 @@ var fundamentals_dict = {};
 
 function get_fundamentals(ticker) {
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://127.0.0.1:5000/fundamentals?ticker=" + ticker, true);
+	xhr.open("GET", "http://127.0.0.1:5000/robinhood/fundamentals?ticker=" + ticker, true);
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {

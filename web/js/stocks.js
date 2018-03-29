@@ -17,7 +17,7 @@ login.onclick = function () {
 	password_field = document.getElementById('password_field');
 
 	var xhr = new XMLHttpRequest();
-	xhr.open("POST", "http://127.0.0.1:5000/login", true);
+	xhr.open("POST", "http://127.0.0.1:5000/robinhood/login", true);
 	xhr.setRequestHeader('Content-Type', 'application/json');
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
@@ -41,7 +41,7 @@ login.onclick = function () {
 
 function get_positions_list() {
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://127.0.0.1:5000/positions", true);
+	xhr.open("GET", "http://127.0.0.1:5000/robinhood/positions", true);
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {
