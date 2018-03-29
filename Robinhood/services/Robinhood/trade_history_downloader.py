@@ -2,7 +2,7 @@ import json
 import csv
 import shelve
 
-from Robinhood import Robinhood
+from services.Robinhood import Robinhood
 
 def get_symbol_from_instrument_url(rb_client, url, db):
     instrument = {}

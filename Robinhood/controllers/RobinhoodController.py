@@ -1,20 +1,19 @@
-from flask import Flask, render_template, request, redirect, Response
-from flask_cors import CORS
-from Robinhood import Robinhood
-
-import urllib2
 import json
+import urllib2
 
-app = Flask(__name__)
-CORS(app)
-rh_client = Robinhood()
-logged_in = False
+from flask import Blueprint, request, Response
 
-@app.route("/login", methods=['POST'])
+from utils.RobinhoodUtil import RobinhoodUtil
+
+robinhood_api = Blueprint('robinhood_api', __name__)
+robinhood_service = RobinhoodUtil()
+rh_client = robinhood_service.get_client()
+
+@robinhood_api.route("/login", methods=['POST'])
 def login():
-    global logged_in
     content = request.get_json(force=True)
-    logged_in = rh_client.login(username=content['user'], password=content['pass'])
+    robinhood_service.set_logged_in(rh_client.login(username=content['user'], password=content['pass']))
+    logged_in = robinhood_service.is_logged_in()
 
     if logged_in:
         message = "Logged in"
@@ -27,18 +26,18 @@ def login():
     print logged_in
     return response
 
-@app.route("/logout", methods=['GET'])
+
+@robinhood_api.route("/logout", methods=['GET'])
 def logout():
-    global logged_in
     req = rh_client.logout()
-    print req;
+    print req
     if req.ok:
         return Response("Logging out", status=200, mimetype='application/json')
     else:
         return Response("Not Logged out", status=200, mimetype='application/json')
 
 # Requires paramenter "ticker" ex. fundamentals?ticker=MSFT
-@app.route("/fundamentals", methods=['GET'])
+@robinhood_api.route("/fundamentals", methods=['GET'])
 def get_fundamentals():
     ticker = request.args.get('ticker')
 
@@ -51,16 +50,15 @@ def get_fundamentals():
 
     return response
 
+
 # Return JSON list of symbols for securities owned by user
-@app.route("/positions", methods=['GET'])
+@robinhood_api.route("/positions", methods=['GET'])
 def get_my_positions():
-    global logged_in
-    if logged_in is True:
+    if robinhood_service.is_logged_in():
         user_positions = rh_client.securities_owned()['results']
         position_list = list()
 
         for position in user_positions:
-
             # Call URL from original dict of positions and then load JSON string and extract symbol for specific stock
             contents = urllib2.urlopen(position['instrument']).read()
             contents_dict = json.loads(contents)
@@ -75,6 +73,3 @@ def get_my_positions():
         response = Response(response_msg, status=200, mimetype='application/json')
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
-
-if __name__ == "__main__":
-    app.run()

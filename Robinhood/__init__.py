@@ -1,7 +1,6 @@
 import six
 
 if six.PY3:
-    from Robinhood.Robinhood import Robinhood
+    pass
 else:
-    from Robinhood import Robinhood
-    import exceptions as RH_exception
+    pass
