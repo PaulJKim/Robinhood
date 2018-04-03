@@ -2,12 +2,27 @@
 * Written by Paul Kim
 */
 
-var logout = document.getElementById('logout');
-var dropdown = document.getElementById('dropdown_button');
-var alphavantage_key = "SVQQFVAXS04D4RUG"
-
 svg = d3.select("svg");
 var margin = {top: 20, right: 20, bottom: 30, left: 50}
+
+var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth() + 1;
+var yyyy = today.getFullYear();
+
+if(dd<10) {
+    dd = '0'+dd
+} 
+
+if(mm<10) {
+    mm = '0'+mm
+} 
+
+var parseDate = d3.timeParse("%Y-%m-%d");
+today = parseDate(yyyy + '-' + mm + '-' + dd);
+
+var logout = document.getElementById('logout');
+var dropdown = document.getElementById('dropdown_button');
 
 dropdown.onclick = function() {
 	document.getElementById("settings_dropdown").classList.toggle("show");
@@ -49,17 +64,18 @@ logout.onclick = function () {
 positions_json = JSON.parse(sessionStorage.myValue);
 list_of_positions = document.getElementById("list_of_positions_div");
 
+// Adding checkboxes for each position owned
 d3.select(list_of_positions).selectAll("div")
-		.data(positions_json)
-		.enter()
-		.append("div")
-		.append("label")
-			.text(function(d) { return d })
-		.append("input")
-			.attr("type", "checkbox")
-			.attr("class", "positions_checkbox")
-			.attr("value", function(d) { return d })
-			.attr("id", function(d) { return d + "_checkbox" });
+	.data(positions_json)
+	.enter()
+	.append("div")
+	.append("label")
+	.text(function(d) { return d })
+	.append("input")
+	.attr("type", "checkbox")
+	.attr("class", "positions_checkbox")
+	.attr("value", function(d) { return d })
+	.attr("id", function(d) { return d + "_checkbox" });
 
 // Set up listeners for checkboxes retrieves data for a security when checkbox is checked
 var checkbox_list = document.getElementsByClassName("positions_checkbox");
@@ -67,15 +83,17 @@ var checkbox_list = document.getElementsByClassName("positions_checkbox");
 for (var i = 0; i <  checkbox_list.length; i++) {
 	console.log(checkbox_list[i].value);
 	checkbox_list[i].onclick = function() {
+
 	    if(this.checked) {
 	    	svg.selectAll("path").remove();
 	        get_fundamentals(this.value);
 	        console.log("Getting time series data");
-	        get_time_series_intraday(this.value);
+	        get_time_series_daily(this.value);
 	    } else {
 	    	svg.selectAll("path").remove();
 	        console.log("Unselected " + this.value);
 	    }
+
 	};
 }
 
@@ -99,14 +117,14 @@ function get_fundamentals(ticker) {
 	xhr.send(null);
 }
 
-function get_time_series_intraday(ticker) {
+function get_time_series_daily(ticker) {
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + ticker + "&outputsize=compact&apikey=" + alphavantage_key, true);
+	xhr.open("GET", "http://127.0.0.1:5000/alphavantage/timeseries/daily/" + ticker, true);
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {
 	    	time_series_dict = {};
-	    	time_series_dict[ticker] = JSON.parse(xhr.responseText)["Time Series (Daily)"];
+	    	time_series_dict[ticker] = JSON.parse(xhr.responseText);
 	    	console.log(time_series_dict);
 	    	process_time_series_data(time_series_dict, ticker);
 	    } else {
@@ -130,7 +148,15 @@ function process_time_series_data(time_series_data) {
 	    }
 	}
 
-	var parseTime = d3.timeParse("%Y-%m-%d");
+	function compare(a,b) {
+	  if (parseTime(a.key) < parseTime(b.key))
+	    return -1;
+	  if (parseTime(a.key) > (b.key))
+	    return 1;
+	  return 0;
+	}
+
+	time_series_array.sort(compare);
 
 	// Scaling methods for graphing volume vs. time
 	var x = d3.scaleTime()
@@ -141,7 +167,7 @@ function process_time_series_data(time_series_data) {
 
 	var y = d3.scaleLinear()
 		.domain(d3.extent(time_series_array, function(d) {
-			return parseInt(d.value['5. volume']);
+			return parseInt(d.value.volume);
 		}))
 		.range([parseInt(svg.attr("height")) - margin.bottom, margin.top]);
 
@@ -150,7 +176,7 @@ function process_time_series_data(time_series_data) {
 	    .x(function(d) {
 	    	return x(parseTime(d.key)) })
 	    .y(function(d) { 
-	    	return y(parseInt(d.value['5. volume'])) });
+	    	return y(parseInt(d.value.volume)) });
 
 	// The data here needs to passed in as an array
 	svg.append("path")
@@ -158,3 +184,5 @@ function process_time_series_data(time_series_data) {
 		.attr("class", "line")
       	.attr("d", volumeline);
 }
+
+
