@@ -10,13 +10,14 @@ alpha_vantage_service = AlphaVantageService()
 
 @alpha_vantage_api.route("/timeseries/intraday&interval=<interval>/<ticker>", methods=['GET'])
 def get_time_series_intraday(interval, ticker):
-    # Reassigned for sake of clarity
     """
+    Calls Alphavantage API and retrieves daily time series data based on a given interval
 
     :param interval: Time interval for intraday. Can be 1min, 15min, 30min, 60min
     :param ticker: Stock ticker
-    :return: Returns a json payload containing daily time-series data
+    :return: Json payload containing intraday time-series data
     """
+    # Reassigned for sake of clarity
     endpoint = alpha_vantage_service.endpoint('time_series_intraday', ticker)
     endpoint = alpha_vantage_service.set_intraday_interval(endpoint, interval)
 
@@ -41,9 +42,10 @@ def get_time_series_intraday(interval, ticker):
 @alpha_vantage_api.route("/timeseries/daily/<ticker>", methods=['GET'])
 def get_time_series_daily(ticker):
     """
+    Calls Alphavantage API and retrieves daily time series data
 
     :param ticker: Stock ticker
-    :return: Returns a json payload containing daily time-series data
+    :return: Json payload containing daily time-series data
     """
     endpoint = alpha_vantage_service.endpoint('time_series_daily', ticker)
 
@@ -67,9 +69,10 @@ def get_time_series_daily(ticker):
 @alpha_vantage_api.route("/timeseries/weekly/<ticker>", methods=['GET'])
 def get_time_series_weekly(ticker):
     """
+    Calls Alphavantage API and retrieves weekly time series data
 
     :param ticker: Stock ticker
-    :return: Returns a json payload containing daily time-series data
+    :return: Json payload containing weekly time-series data
     """
     endpoint = alpha_vantage_service.endpoint('time_series_weekly', ticker)
 
@@ -93,9 +96,10 @@ def get_time_series_weekly(ticker):
 @alpha_vantage_api.route("/timeseries/monthly/<ticker>", methods=['GET'])
 def get_time_series_monthly(ticker):
     """
+    Calls Alphavantage API and retrieves monthly time series data
 
     :param ticker: Stock ticker
-    :return: Returns a json payload containing daily time-series data
+    :return: Json payload containing daily time-series data
     """
     endpoint = alpha_vantage_service.endpoint('time_series_monthly', ticker)
 

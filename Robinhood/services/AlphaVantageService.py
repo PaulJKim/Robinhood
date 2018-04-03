@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+from model.TimeSeriesDataPoint import TimeSeriesDataPoint
+
+
 class AlphaVantageService:
     baseURI = "https://www.alphavantage.co/query?function="
     key = "SVQQFVAXS04D4RUG"
@@ -31,4 +35,34 @@ class AlphaVantageService:
 
             formatted_dict[date] = value_dict
 
+            # self.trim_data_daily(formatted_dict)
+
         return formatted_dict
+
+    def convert_date(self, date):
+        return datetime.strptime(date, "%Y-%m-%d")
+
+    def marshall(self, data):
+        time_series_list = list()
+        for entry in data.keys():
+            self.convert_date(entry)
+            volume = data[entry]["volume"]
+            close = data[entry]["close"]
+            high = data[entry]["high"]
+            open = data[entry]["open"]
+            low = data[entry]["low"]
+            time_series_list.append(TimeSeriesDataPoint(self.convert_date(entry), volume, close, high, open, low))
+
+        return time_series_list
+
+    # def trim_data_daily(self, dict):
+    #     now = datetime.now().date()
+    #
+    #     for key in dict:
+    #         if datetime.strptime("%Y-%m-%d", key) > datetime.strptime("%Y-%m-%d", now - timedelta(days=-30)):
+    #             pass
+    #     print now
+    #     print "Testing trim"
+
+
+

@@ -9,18 +9,25 @@ robinhood_api = Blueprint('robinhood_api', __name__)
 robinhood_service = RobinhoodUtil()
 rh_client = robinhood_service.get_client()
 
+
 @robinhood_api.route("/login", methods=['POST'])
 def login():
+    """
+    Login to Robinhood client with credtials
+
+    :return: Reponse with message indicating successful or failed login
+    """
     content = request.get_json(force=True)
     robinhood_service.set_logged_in(rh_client.login(username=content['user'], password=content['pass']))
     logged_in = robinhood_service.is_logged_in()
 
     if logged_in:
         message = "Logged in"
+        response = Response(message, status=200, mimetype='application/json')
     else:
         message = "Failed to log in"
+        response = Response(message, status=401, mimetype='application/json')
 
-    response = Response(message, status=200, mimetype='application/json')
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     print logged_in
@@ -29,6 +36,11 @@ def login():
 
 @robinhood_api.route("/logout", methods=['GET'])
 def logout():
+    """
+    Logout of Robinhood Client
+
+    :return: Response with message indicating successful or failed logout
+    """
     req = rh_client.logout()
     print req
     if req.ok:
@@ -36,9 +48,15 @@ def logout():
     else:
         return Response("Not Logged out", status=200, mimetype='application/json')
 
+
 # Requires paramenter "ticker" ex. fundamentals?ticker=MSFT
 @robinhood_api.route("/fundamentals", methods=['GET'])
 def get_fundamentals():
+    """
+    Retrieves fundamentals for each owned security for logged in user
+
+    :return: Response
+    """
     ticker = request.args.get('ticker')
 
     # Retrieve fundamentals from Robinhood and convert to JSON
@@ -54,6 +72,11 @@ def get_fundamentals():
 # Return JSON list of symbols for securities owned by user
 @robinhood_api.route("/positions", methods=['GET'])
 def get_my_positions():
+    """
+    Retrieves a list of all positions of user in Robinhood
+
+    :return:
+    """
     if robinhood_service.is_logged_in():
         user_positions = rh_client.securities_owned()['results']
         position_list = list()
@@ -70,6 +93,6 @@ def get_my_positions():
         return response
     else:
         response_msg = "Not logged in"
-        response = Response(response_msg, status=200, mimetype='application/json')
+        response = Response(response_msg, status=401, mimetype='application/json')
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
