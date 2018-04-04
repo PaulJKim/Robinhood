@@ -56,7 +56,10 @@ def get_time_series_daily(ticker):
 
         formatted_dict = alpha_vantage_service.format_time_series(time_series_data)
 
-        response = Response(json.dumps(formatted_dict), status=200, mimetype='application/json')
+        entry_list = alpha_vantage_service.marshall(formatted_dict)
+        trimmed_entry_list = alpha_vantage_service.trim_data_daily(entry_list)
+
+        response = Response(json.dumps(trimmed_entry_list), status=200, mimetype='application/json')
         response.headers.add('Access-Control-Allow-Origin', '*')
 
         return response

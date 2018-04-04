@@ -44,25 +44,28 @@ class AlphaVantageService:
 
     def marshall(self, data):
         time_series_list = list()
-        for entry in data.keys():
-            self.convert_date(entry)
-            volume = data[entry]["volume"]
-            close = data[entry]["close"]
-            high = data[entry]["high"]
-            open = data[entry]["open"]
-            low = data[entry]["low"]
-            time_series_list.append(TimeSeriesDataPoint(self.convert_date(entry), volume, close, high, open, low))
+        for date, values in data.iteritems():
+            volume = values["volume"]
+            close = values["close"]
+            high = values["high"]
+            open = values["open"]
+            low = values["low"]
+            time_series_list.append(TimeSeriesDataPoint(date, volume, close, high, open, low))
+
+        time_series_list.sort()
 
         return time_series_list
 
-    # def trim_data_daily(self, dict):
-    #     now = datetime.now().date()
-    #
-    #     for key in dict:
-    #         if datetime.strptime("%Y-%m-%d", key) > datetime.strptime("%Y-%m-%d", now - timedelta(days=-30)):
-    #             pass
-    #     print now
-    #     print "Testing trim"
+    def trim_data_daily(self, entry_list):
+        now = datetime.now()
+        trimmed_list_daily = list()
+
+        for entry in entry_list:
+            if entry.get_date() > datetime.strftime(now - timedelta(days=30), "%Y-%m-%d"):
+                print entry.__dict__
+                trimmed_list_daily.append(entry.__dict__)
+
+        return trimmed_list_daily
 
 
 
