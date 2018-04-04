@@ -3,6 +3,7 @@ from model.TimeSeriesDataPoint import TimeSeriesDataPoint
 
 
 class AlphaVantageService:
+
     baseURI = "https://www.alphavantage.co/query?function="
     key = "SVQQFVAXS04D4RUG"
 
@@ -56,13 +57,26 @@ class AlphaVantageService:
 
         return time_series_list
 
+    def trim_data_intraday(self, entry_list):
+        now = datetime.now()
+        now_hour = now.hour
+        now_minutes = now.minute
+        now_seconds = now.second
+        trimmed_list_daily = list()
+
+        for entry in entry_list:
+            print datetime.strftime(now - timedelta(hours=now_hour, minutes=now_minutes, seconds=now_seconds), "%Y-%m-%d %H:%M:%S")
+            if entry.get_date() > datetime.strftime(now - timedelta(hours=now_hour, minutes=now_minutes, seconds=now_seconds), "%Y-%m-%d %H:%M:%S"):
+                trimmed_list_daily.append(entry.__dict__)
+
+        return trimmed_list_daily
+
     def trim_data_daily(self, entry_list):
         now = datetime.now()
         trimmed_list_daily = list()
 
         for entry in entry_list:
             if entry.get_date() > datetime.strftime(now - timedelta(days=30), "%Y-%m-%d"):
-                print entry.__dict__
                 trimmed_list_daily.append(entry.__dict__)
 
         return trimmed_list_daily

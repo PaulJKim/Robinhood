@@ -28,7 +28,13 @@ def get_time_series_intraday(interval, ticker):
 
         formatted_dict = alpha_vantage_service.format_time_series(time_series_data)
 
-        response = Response(json.dumps(formatted_dict), status=200, mimetype='application/json')
+        # List of TimeSeriesDataPoints
+        entry_list = alpha_vantage_service.marshall(formatted_dict)
+
+        # Trims daily time series to include only the past 24 hours
+        trimmed_entry_list = alpha_vantage_service.trim_data_intraday(entry_list)
+
+        response = Response(json.dumps(trimmed_entry_list), status=200, mimetype='application/json')
         response.headers.add('Access-Control-Allow-Origin', '*')
 
         return response
@@ -54,9 +60,13 @@ def get_time_series_daily(ticker):
         content_json = json.loads(content_raw)
         time_series_data = content_json['Time Series (Daily)']
 
+        # Formats json content into dict
         formatted_dict = alpha_vantage_service.format_time_series(time_series_data)
 
+        # List of TimeSeriesDataPoints
         entry_list = alpha_vantage_service.marshall(formatted_dict)
+
+        # Trims daily time series to include only the past 4 weeks
         trimmed_entry_list = alpha_vantage_service.trim_data_daily(entry_list)
 
         response = Response(json.dumps(trimmed_entry_list), status=200, mimetype='application/json')
@@ -68,6 +78,7 @@ def get_time_series_daily(ticker):
         response.headers.add('Access-Control-Allow-Origin', '*')
 
         return response
+
 
 @alpha_vantage_api.route("/timeseries/weekly/<ticker>", methods=['GET'])
 def get_time_series_weekly(ticker):
@@ -95,6 +106,7 @@ def get_time_series_weekly(ticker):
         response.headers.add('Access-Control-Allow-Origin', '*')
 
         return response
+
 
 @alpha_vantage_api.route("/timeseries/monthly/<ticker>", methods=['GET'])
 def get_time_series_monthly(ticker):
