@@ -123,10 +123,9 @@ function get_time_series_daily(ticker) {
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {
-	    	time_series_dict = {};
-	    	time_series_dict[ticker] = JSON.parse(xhr.responseText);
-	    	console.log(time_series_dict);
-	    	process_time_series_data(time_series_dict, ticker);
+	    	time_series_list = JSON.parse(xhr.responseText);
+	    	console.log(time_series_list);
+	    	process_time_series_data(time_series_list, ticker);
 	    } else {
 	      	alert(xhr.responseText + " : " + xhr.statusText);
 	    }
@@ -139,44 +138,33 @@ function get_time_series_daily(ticker) {
 }
 
 function process_time_series_data(time_series_data) {
-	ticker = Object.keys(time_series_data)[0];
-    time_series_array = [];
+	// ticker = Object.keys(time_series_data)[0];
+	time_series_array = [];
 
-    for (date in time_series_data[ticker]) {
-	    if (time_series_data[ticker].hasOwnProperty(date)) {
-	        time_series_array.push({key : date, value : time_series_data[ticker][date]});
-	    }
+    for (i = 0; i < time_series_data.length; i++) {
+	    time_series_array.push({key : time_series_data[i]["date"], value : time_series_data[i]});
 	}
-
-	function compare(a,b) {
-	  if (parseTime(a.key) < parseTime(b.key))
-	    return -1;
-	  if (parseTime(a.key) > (b.key))
-	    return 1;
-	  return 0;
-	}
-
-	time_series_array.sort(compare);
 
 	// Scaling methods for graphing volume vs. time
 	var x = d3.scaleTime()
-		.domain(d3.extent(time_series_array, function(d) {
-			return parseTime(d.key);
+		.domain(d3.extent(time_series_data, function(d) {
+			return parseDate(d["date"]);
 		}))
 	    .range([margin.left, svg.attr("width") - margin.right]);
 
 	var y = d3.scaleLinear()
-		.domain(d3.extent(time_series_array, function(d) {
-			return parseInt(d.value.volume);
+		.domain(d3.extent(time_series_data, function(d) {
+			return d["high_price"];
 		}))
 		.range([parseInt(svg.attr("height")) - margin.bottom, margin.top]);
 
 	// Creates a line graph of volume per day
 	var volumeline = d3.line()
 	    .x(function(d) {
-	    	return x(parseTime(d.key)) })
+	    	console.log(d);
+	    	return x(parseDate(d.key)) })
 	    .y(function(d) { 
-	    	return y(parseInt(d.value.volume)) });
+	    	return y(parseInt(d.value["high_price"])) });
 
 	// The data here needs to passed in as an array
 	svg.append("path")
