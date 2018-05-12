@@ -3,7 +3,7 @@
 */
 
 svg = d3.select("svg");
-var margin = {top: 20, right: 20, bottom: 30, left: 50}
+var margin = {top: 20, right: 20, bottom: 55, left: 50}
 
 var today = new Date();
 var dd = today.getDate();
@@ -125,7 +125,7 @@ function get_time_series_daily(ticker) {
 	    if (xhr.status === 200) {
 	    	time_series_list = JSON.parse(xhr.responseText);
 	    	console.log(time_series_list);
-	    	process_time_series_data(time_series_list, ticker);
+	    	update(time_series_list);
 	    } else {
 	      	alert(xhr.responseText + " : " + xhr.statusText);
 	    }
@@ -137,7 +137,7 @@ function get_time_series_daily(ticker) {
 	xhr.send(null);
 }
 
-function process_time_series_data(time_series_data) {
+function update(time_series_data) {
 	// ticker = Object.keys(time_series_data)[0];
 	time_series_array = [];
 
@@ -145,6 +145,7 @@ function process_time_series_data(time_series_data) {
 	    time_series_array.push({key : time_series_data[i]["date"], value : time_series_data[i]});
 	}
 
+	svg.select('g')
 	// Scaling methods for graphing volume vs. time
 	var x = d3.scaleTime()
 		.domain(d3.extent(time_series_data, function(d) {
