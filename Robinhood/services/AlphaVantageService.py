@@ -36,8 +36,6 @@ class AlphaVantageService:
 
             formatted_dict[date] = value_dict
 
-            # self.trim_data_daily(formatted_dict)
-
         return formatted_dict
 
     def convert_date(self, date):

@@ -145,7 +145,6 @@ function update(time_series_data) {
 	    time_series_array.push({key : time_series_data[i]["date"], value : time_series_data[i]});
 	}
 
-	svg.select('g')
 	// Scaling methods for graphing volume vs. time
 	var x = d3.scaleTime()
 		.domain(d3.extent(time_series_data, function(d) {
@@ -158,6 +157,8 @@ function update(time_series_data) {
 			return d["high_price"];
 		}))
 		.range([parseInt(svg.attr("height")) - margin.bottom, margin.top]);
+
+	var linechart = svg.selectAll('.linechart')
 
 	// Creates a line graph of volume per day
 	var volumeline = d3.line()

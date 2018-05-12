@@ -26,9 +26,10 @@ def get_time_series_intraday(interval, ticker):
         content_json = json.loads(content_raw)
         time_series_data = content_json['Time Series (' + interval + ')']
 
+        # Reformat JSON content by removing numbering from AlphaVantage
         formatted_dict = alpha_vantage_service.format_time_series(time_series_data)
 
-        # List of TimeSeriesDataPoints
+        # Marshall data into time series data point model
         entry_list = alpha_vantage_service.marshall(formatted_dict)
 
         # Trims daily time series to include only the past 24 hours
@@ -60,10 +61,10 @@ def get_time_series_daily(ticker):
         content_json = json.loads(content_raw)
         time_series_data = content_json['Time Series (Daily)']
 
-        # Formats json content into dict
+        # Reformat JSON content by removing numbering from AlphaVantage
         formatted_dict = alpha_vantage_service.format_time_series(time_series_data)
 
-        # List of TimeSeriesDataPoints
+        # Marshall data into time series data point model
         entry_list = alpha_vantage_service.marshall(formatted_dict)
 
         # Trims daily time series to include only the past 4 weeks
