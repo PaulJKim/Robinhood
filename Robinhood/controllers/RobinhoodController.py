@@ -49,11 +49,11 @@ def logout():
         return Response("Not Logged out", status=200, mimetype='application/json')
 
 
-# Requires paramenter "ticker" ex. fundamentals?ticker=MSFT
 @robinhood_api.route("/fundamentals", methods=['GET'])
 def get_fundamentals():
     """
     Retrieves fundamentals for each owned security for logged in user
+    Requires paramenter "ticker" ex. fundamentals?ticker=MSFT
 
     :return: Response
     """
@@ -87,6 +87,9 @@ def get_my_positions():
             contents_dict = json.loads(contents)
             position_list.append(contents_dict['symbol'])
 
+        # For Testing
+        position_list = ['MSFT', 'SQ', 'W']
+
         response = Response(json.dumps(position_list), status=200, mimetype='application/json')
         response.headers.add('Access-Control-Allow-Origin', '*')
 
@@ -96,3 +99,22 @@ def get_my_positions():
         response = Response(response_msg, status=401, mimetype='application/json')
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
+
+# Return last price of given stock ex. price?ticker=MSFT
+@robinhood_api.route("/price", methods=['GET'])
+def get_last_price():
+    """
+    Retrieves last trade price.
+    Requires parameter "ticker" ex. price?ticker=MSFT
+
+    :return: Last trade price
+    """
+    ticker = request.args.get('ticker')
+
+    # Retrieve last trade price from Robinhood
+    price = robinhood_service.get_last_trade_price(ticker=ticker)[0][0]
+
+    response = Response(json.dumps(price), status=200, mimetype='application/json')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response

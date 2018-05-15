@@ -64,7 +64,7 @@ logout.onclick = function () {
 positions_json = JSON.parse(sessionStorage.myValue);
 list_of_positions = document.getElementById("list_of_positions_div");
 
-// Adding checkboxes for each position owned
+// Adding radio for each position owned
 d3.select(list_of_positions).selectAll("div")
 	.data(positions_json)
 	.enter()
@@ -72,28 +72,22 @@ d3.select(list_of_positions).selectAll("div")
 	.append("label")
 	.text(function(d) { return d })
 	.append("input")
-	.attr("type", "checkbox")
-	.attr("class", "positions_checkbox")
+	.attr("type", "radio")
+	.attr("class", "positions_radio")
+	.attr("name", "positions")
 	.attr("value", function(d) { return d })
-	.attr("id", function(d) { return d + "_checkbox" });
+	.attr("id", function(d) { return d + "_radio" });
 
 // Set up listeners for checkboxes retrieves data for a security when checkbox is checked
-var checkbox_list = document.getElementsByClassName("positions_checkbox");
+var radio_list = document.getElementsByClassName("positions_radio");
 
-for (var i = 0; i <  checkbox_list.length; i++) {
-	console.log(checkbox_list[i].value);
-	checkbox_list[i].onclick = function() {
-
-	    if(this.checked) {
-	    	svg.selectAll("path").remove();
-	        get_fundamentals(this.value);
-	        console.log("Getting time series data");
-	        get_time_series_daily(this.value);
-	    } else {
-	    	svg.selectAll("path").remove();
-	        console.log("Unselected " + this.value);
-	    }
-
+for (var i = 0; i <  radio_list.length; i++) {
+	console.log(radio_list[i].value);
+	radio_list[i].onclick = function() {
+    	svg.selectAll("path").remove();
+        get_fundamentals(this.value);
+        console.log("Getting time series data");
+        get_time_series_daily(this.value);
 	};
 }
 
@@ -117,15 +111,14 @@ function get_fundamentals(ticker) {
 	xhr.send(null);
 }
 
-function get_time_series_daily(ticker) {
+function get_last_price(ticker) {
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://127.0.0.1:5000/alphavantage/timeseries/daily/" + ticker, true);
+	xhr.open("GET", "http://127.0.0.1:5000/robinhood/price?ticker=" + ticker, true);
 	xhr.onload = function (e) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {
-	    	time_series_list = JSON.parse(xhr.responseText);
-	    	console.log(time_series_list);
-	    	update(time_series_list);
+	    	price = JSON.parse(xhr.responseText);
+	    	return price;
 	    } else {
 	      	alert(xhr.responseText + " : " + xhr.statusText);
 	    }
@@ -137,8 +130,29 @@ function get_time_series_daily(ticker) {
 	xhr.send(null);
 }
 
-function update(time_series_data) {
-	// ticker = Object.keys(time_series_data)[0];
+function get_time_series_daily(ticker) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "http://127.0.0.1:5000/alphavantage/timeseries/daily/" + ticker, true);
+	xhr.onload = function (e) {
+	  if (xhr.readyState === 4) {
+	    if (xhr.status === 200) {
+	    	time_series_list = JSON.parse(xhr.responseText);
+	    	last_price = get_last_price(ticker);
+	    	console.log(time_series_list);
+
+	    	update(time_series_list, last_price);
+	    } else {
+	      	alert(xhr.responseText + " : " + xhr.statusText);
+	    }
+	  }
+	};
+	xhr.onerror = function (e) {
+	  console.error(xhr.statusText);
+	};
+	xhr.send(null);
+}
+
+function update(time_series_data, last_price) {
 	time_series_array = [];
 
     for (i = 0; i < time_series_data.length; i++) {
