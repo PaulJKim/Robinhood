@@ -137,7 +137,7 @@ function get_time_series_daily(ticker) {
 	  if (xhr.readyState === 4) {
 	    if (xhr.status === 200) {
 	    	time_series_list = JSON.parse(xhr.responseText);
-	    	last_price = get_last_price(ticker);
+	    	//last_price = get_last_price(ticker);
 	    	console.log(time_series_list);
 
 	    	update(time_series_list, last_price);
@@ -158,6 +158,10 @@ function update(time_series_data, last_price) {
     for (i = 0; i < time_series_data.length; i++) {
 	    time_series_array.push({key : time_series_data[i]["date"], value : time_series_data[i]});
 	}
+
+	svg.selecAll('.price_label')
+		.append('label')
+		.attr('text', last_price);
 
 	// Scaling methods for graphing volume vs. time
 	var x = d3.scaleTime()

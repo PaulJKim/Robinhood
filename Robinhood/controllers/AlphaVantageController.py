@@ -77,6 +77,7 @@ def get_time_series_daily(ticker):
     except:
         response = Response(status=500, mimetype='application/json')
         response.headers.add('Access-Control-Allow-Origin', '*')
+        print (response)
         return response
 
 
